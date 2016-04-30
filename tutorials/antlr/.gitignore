@@ -1,0 +1,7 @@
+# Auto-generated
+RegexLexer.js
+RegexParser.js
+RegexListener.js
+RegexVisitor.js
+*.tokens
+*.map

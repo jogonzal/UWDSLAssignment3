@@ -1,0 +1,8 @@
+*.jar
+
+# Auto-generated
+HandlebarsLexer.js
+HandlebarsParser.js
+HandlebarsParserListener.js
+HandlebarsParserVisitor.js
+*.tokens

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en_US">
+<head>
+    <meta charset="utf-8"/>
+    <title>Homework 3: ANTLR Parser Generator + Templating language</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
+          integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+            integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.4.5/mocha.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.4.5/mocha.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/3.5.0/chai.min.js"></script>
+    <script src="lib/require.js"></script>
+
+    <style>
+        body {
+            padding: 30px;
+        }
+
+        #mocha .progress {
+            height: auto;
+            box-shadow: none;
+            background-image: none;
+            background-color: initial;
+        }
+    </style>
+
+    <script src="test.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            mocha.run();
+        });
+    </script>
+</head>
+
+<body>
+<h1>Homework 3: ANTLR Parser Generator + Templating language</h1>
+
+<p>
+    This page is a test harness for Homework 3. The graders will use
+    Chrome 49 (not Chromium) to test your assignments; you will want
+    every test on this page to pass, as well as several hidden tests
+    that the graders will also run.
+</p>
+
+<p>The graders will also examine your code. Do not make any
+    changes to this page.</p>
+
+<div id="mocha"></div>
+<div id="messages"></div>
+<div id="fixtures"></div>
+</body>
+</html>
