@@ -11,6 +11,6 @@ element
     | commentElement
     ;
 
-rawElement  : TEXT;
+rawElement  : TEXT | BRACE TEXT;
 
 commentElement : START COMMENT END_COMMENT ;
