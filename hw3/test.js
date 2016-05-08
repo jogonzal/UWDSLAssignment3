@@ -40,6 +40,7 @@ describe("Parsing", function () {
     });
 });
 
+/*
 describe("Expressions", function () {
     it("Parse expressions with data references", function () {
         var template = `
@@ -582,3 +583,4 @@ describe("Blocks", function () {
         expect(render).to.equal(expected);
     });
 });
+*/

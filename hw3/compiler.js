@@ -61,7 +61,10 @@ HandlebarsCompiler.prototype.append = function (expr) {
 };
 
 HandlebarsCompiler.prototype.exitRawElement = function (ctx) {
-    this.append(`"${HandlebarsCompiler.escape(ctx.getText())}"`);
+    // Simply grab all the text and output it
+    var text = ctx.getText();
+    var escapedText = HandlebarsCompiler.escape(text);
+    this.append(`"${escapedText}"`);
 };
 
 exports.HandlebarsCompiler = HandlebarsCompiler;
