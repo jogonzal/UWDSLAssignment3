@@ -14,6 +14,10 @@ function HandlebarsCompiler() {
 HandlebarsCompiler.prototype = Object.create(HandlebarsParserListener.prototype);
 HandlebarsCompiler.prototype.constructor = HandlebarsCompiler;
 
+HandlebarsCompiler.prototype.mangleEscape = function(expr) {
+    return `__$${expr}`;
+};
+
 HandlebarsCompiler.escape = function (string) {
     return ('' + string).replace(/["'\\\n\r\u2028\u2029]/g, function (c) {
         switch (c) {
@@ -38,7 +42,7 @@ HandlebarsCompiler.prototype.registerExprHelper = function(name, helper) {
 };
 
 HandlebarsCompiler.prototype.registerBlockHelper = function (name, helper) {
-    this._helpers.block[name] = helper;
+    this._helpers.block[this.mangleEscape(name)] = helper;
 };
 
 HandlebarsCompiler.prototype.compile = function (template) {
@@ -65,6 +69,52 @@ HandlebarsCompiler.prototype.exitRawElement = function (ctx) {
     var text = ctx.getText();
     var escapedText = HandlebarsCompiler.escape(text);
     this.append(`"${escapedText}"`);
+};
+
+HandlebarsCompiler.prototype.exitDocument = function (ctx) {
+    // Simply grab all the text and log it - for debugging purposes
+    // console.log(this._bodySource);
+};
+
+HandlebarsCompiler.prototype.exitLiteral = function (ctx) {
+    // All literals simply copy text
+    ctx.source = `${ctx.getText()}`;
+};
+
+HandlebarsCompiler.prototype.exitParenthesizedExpression = function (ctx) {
+    // All parenthesized expressions depend on the expressions inside of them
+    ctx.source = `${ctx.exp.source}`;
+};
+
+HandlebarsCompiler.prototype.exitDataLookup = function (ctx) {
+    // For datalookup, simply lookup the variable in inputvar
+    ctx.source = `${this._inputVar + "." + ctx.variableName.text}`;
+};
+
+HandlebarsCompiler.prototype.exitExpression = function (ctx) {
+    // Bubble up to expressionElement
+    ctx.source = `${ctx.children[0].source}`;
+};
+
+HandlebarsCompiler.prototype.exitExpressionElement = function (ctx) {
+    // Output this to string
+    var src = `${ctx.exp.source}`;
+    this.append(src);
+};
+
+HandlebarsCompiler.prototype.exitHelperApplication = function (ctx) {
+    // Output this to string
+    var functionBeingCalled = ctx.funcName.text;
+    var mangleEscapedFunctionName = this.mangleEscape(functionBeingCalled);
+
+    // Add function call
+    ctx.source = `${mangleEscapedFunctionName}(${this._inputVar}`;
+    // Add parameters
+    for (var i = 0; i < ctx.args.length; i++) {
+        ctx.source += `,${ctx.args[i].source}`;
+    }
+    // Close parentheses
+    ctx.source += ')';
 };
 
 exports.HandlebarsCompiler = HandlebarsCompiler;

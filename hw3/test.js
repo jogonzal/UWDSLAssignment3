@@ -40,7 +40,7 @@ describe("Parsing", function () {
     });
 });
 
-/*
+
 describe("Expressions", function () {
     it("Parse expressions with data references", function () {
         var template = `
@@ -198,6 +198,7 @@ describe("Expressions", function () {
     });
 });
 
+/*
 describe("Blocks", function () {
     it("Fail on non-matching blocks", function () {
         var template = "<html>{{#block 1 2 3}} Text {{/wrong}}</html>";

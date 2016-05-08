@@ -26,7 +26,7 @@ FLOAT
 fragment INT :   '0' | [1-9] [0-9]* ; // no leading zeros
 fragment EXP :   [Ee] [+\-]? INT ;
 
-INTEGER : [0-9]+ ;
+INTEGER : '-'? [0-9]+ ;
 
 STRING :  '\'' (ESC | ~['\\])* '\'' ;
 fragment ESC :   '\\' (['\\/bfnrt] | UNICODE) ;
