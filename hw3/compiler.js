@@ -8,6 +8,7 @@ function HandlebarsCompiler() {
     this._inputVar = "__$ctx";
     this._outputVar = "__$result";
     this._helpers = { expr: {}, block: {} };
+    this._usedExprHelpers = [];
     return this;
 }
 
@@ -42,7 +43,17 @@ HandlebarsCompiler.prototype.registerExprHelper = function(name, helper) {
 };
 
 HandlebarsCompiler.prototype.registerBlockHelper = function (name, helper) {
-    this._helpers.block[this.mangleEscape(name)] = helper;
+    this._helpers.block[name] = helper;
+};
+
+HandlebarsCompiler.prototype.addHelpers = function(){
+    for(var i = 0; i < this._usedExprHelpers.length; i++) {
+        var funcName = this._usedExprHelpers[i];
+        var mangledFuncName = this.mangleEscape(funcName);
+        var funcBody = this._helpers.expr[funcName];
+        var funcSignatureAndBody = `\nvar ${mangledFuncName} = ${funcBody.toString()}\n`;
+        this._bodySource = funcSignatureAndBody + this._bodySource;
+    }
 };
 
 HandlebarsCompiler.prototype.compile = function (template) {
@@ -54,7 +65,10 @@ HandlebarsCompiler.prototype.compile = function (template) {
     var parser = new HandlebarsParser(tokens);
     parser.buildParseTrees = true;
     var tree = parser.document();
+
     antlr4.tree.ParseTreeWalker.DEFAULT.walk(this, tree);
+
+    this.addHelpers();
 
     this._bodySource += `return ${this._outputVar};\n`;
     return new Function(this._inputVar, this._bodySource);
@@ -106,6 +120,9 @@ HandlebarsCompiler.prototype.exitHelperApplication = function (ctx) {
     // Output this to string
     var functionBeingCalled = ctx.funcName.text;
     var mangleEscapedFunctionName = this.mangleEscape(functionBeingCalled);
+
+    // Add to used expr helpers
+    this._usedExprHelpers.push(functionBeingCalled);
 
     // Add function call
     ctx.source = `${mangleEscapedFunctionName}(${this._inputVar}`;

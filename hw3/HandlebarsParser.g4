@@ -23,9 +23,9 @@ expression returns [source] :
     ;
 
 literal returns [source]:
-    INTEGER     #Integer
-    | FLOAT     #Float
-    | STRING    #String
+    INTEGER
+    | FLOAT
+    | STRING
     ;
 
 parenthesizedExpression returns [source]:
