@@ -4,6 +4,7 @@ var HandlebarsParser = require('HandlebarsParser').HandlebarsParser;
 var HandlebarsParserListener = require('HandlebarsParserListener').HandlebarsParserListener;
 
 var foreachFunction = function(ctx, body, lookup){
+    // Output the body multiple times
     var appendedResult = "";
     var varArr = lookup;
     for(var i = 0; i< varArr.length; i++){
@@ -13,6 +14,7 @@ var foreachFunction = function(ctx, body, lookup){
 };
 
 var ifFunction = function(ctx, body, lookup){
+    // For some reason, in the if block the lookup is already evaluated
     if(lookup){
         return body(ctx);
     }
@@ -20,6 +22,7 @@ var ifFunction = function(ctx, body, lookup){
 };
 
 var withFunction = function(ctx, body, lookup){
+    // Contrary to the if block, in the with block the lookup needs to be looked up in the context
     return body(ctx[lookup]);
 };
 
@@ -128,7 +131,7 @@ HandlebarsCompiler.prototype.exitRawElement = function (ctx) {
 };
 
 HandlebarsCompiler.prototype.exitDocument = function (ctx) {
-    // Simply grab all the text and log it - for debugging purposes
+    // Simply grab all the text and log it - for debugging purposes only
     // console.log(this._bodySource);
 };
 
@@ -177,15 +180,16 @@ HandlebarsCompiler.prototype.exitHelperApplication = function (ctx) {
 };
 
 HandlebarsCompiler.prototype.exitBlockElement = function (ctx){
-    if (ctx.start.identifier.text != ctx.end.identifier.text) {
+    if (!(ctx.start.identifier.text == ctx.end.identifier.text)) {
         throw `Block start '${ctx.start.identifier.text}' does not match the block end '${ctx.end.identifier.text}'.`;
     }
-    var temp = `${this.mangleEscape(ctx.start.identifier.text)}(${this._inputVar},${ctx.body.source}`;
+
+    var functionCall = `${this.mangleEscape(ctx.start.identifier.text)}(${this._inputVar},${ctx.body.source}`;
     for (var i = 0; i < ctx.start.args.length; i++) {
-        temp += `,${ctx.start.args[i].source}`;
+        functionCall += `,${ctx.start.args[i].source}`;
     }
-    temp += ')';
-    this.append(temp);
+    functionCall += ')';
+    this.append(functionCall);
 };
 
 HandlebarsCompiler.prototype.enterBlockBody = function (ctx) {
@@ -193,7 +197,8 @@ HandlebarsCompiler.prototype.enterBlockBody = function (ctx) {
 };
 
 HandlebarsCompiler.prototype.exitBlockBody = function (ctx) {
-    ctx.source = (new Function(this._inputVar, this.popScope())).toString();
+    var accumulatedbody = this.popScope();
+    ctx.source = (new Function(this._inputVar, accumulatedbody)).toString();
 };
 
 HandlebarsCompiler.prototype.exitSubExpression = function (ctx) {
