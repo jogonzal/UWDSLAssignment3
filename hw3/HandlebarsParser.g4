@@ -16,10 +16,10 @@ rawElement
     | BRACE TEXT;
 
 expression returns [source] :
-    parenthesizedExpression
+    helperApplication
+    | parenthesizedExpression
     | literal
     | dataLookup
-    | helperApplication
     ;
 
 literal returns [source]:
@@ -44,13 +44,17 @@ expressionElement:
     START exp=expression END
     ;
 
-blockElement :
-    startBlock element* endBlock;
+blockElement returns [source]:
+    start=blockStart body=blockBody end=blockEnd;
 
-startBlock:
-    START BLOCK ID expression* END;
+blockStart returns [source]:
+    START BLOCK identifier=ID (args+=expression)* END;
 
-endBlock:
-    START BLOCK ID CLOSE_BLOCK END;
+blockEnd returns [source]:
+    START CLOSE_BLOCK identifier=ID CLOSE_BLOCK END;
+
+blockBody returns [source]:
+    element*
+    ;
 
 commentElement : START COMMENT END_COMMENT ;

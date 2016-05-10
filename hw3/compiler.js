@@ -52,12 +52,19 @@ HandlebarsCompiler.prototype.addHelpers = function(){
         var mangledFuncName = this.mangleEscape(funcName);
         var funcBody = this._helpers.expr[funcName];
         var funcSignatureAndBody = `\nvar ${mangledFuncName} = ${funcBody.toString()}\n`;
-        this._bodySource = funcSignatureAndBody + this._bodySource;
+        this._bodyStack[this._bodyStack.length -1] = funcSignatureAndBody + this._bodyStack[this._bodyStack.length -1];
+    }
+};
+
+HandlebarsCompiler.prototype.addBlocks = function(){
+    for(var block in this._helpers.block) {
+        this._bodyStack[this._bodyStack.length -1] = `var ${this.mangleEscape(block)} = ${this._helpers.block[block].toString()}\n${this._bodyStack[this._bodyStack.length -1]}`;
     }
 };
 
 HandlebarsCompiler.prototype.compile = function (template) {
-    this._bodySource = `var ${this._outputVar} = "";\n`;
+    this._bodyStack = [];
+    this.pushScope();
 
     var chars = new antlr4.InputStream(template);
     var lexer = new HandlebarsLexer(chars);
@@ -69,13 +76,23 @@ HandlebarsCompiler.prototype.compile = function (template) {
     antlr4.tree.ParseTreeWalker.DEFAULT.walk(this, tree);
 
     this.addHelpers();
+    this.addBlocks();
 
-    this._bodySource += `return ${this._outputVar};\n`;
-    return new Function(this._inputVar, this._bodySource);
+    return new Function(this._inputVar, this.popScope());
+};
+
+HandlebarsCompiler.prototype.pushScope = function (expr) {
+    this._bodyStack.push("");
+    this._bodyStack[this._bodyStack.length -1] = `var ${this._outputVar} = "";\n`;
+};
+
+HandlebarsCompiler.prototype.popScope = function (expr) {
+    this._bodyStack[this._bodyStack.length -1] += `return ${this._outputVar};\n`;
+    return this._bodyStack.pop();
 };
 
 HandlebarsCompiler.prototype.append = function (expr) {
-    this._bodySource += `${this._outputVar} += ${expr};\n`
+    this._bodyStack[this._bodyStack.length -1] += `${this._outputVar} += ${expr};\n`
 };
 
 HandlebarsCompiler.prototype.exitRawElement = function (ctx) {
@@ -132,6 +149,26 @@ HandlebarsCompiler.prototype.exitHelperApplication = function (ctx) {
     }
     // Close parentheses
     ctx.source += ')';
+};
+
+HandlebarsCompiler.prototype.exitBlockElement = function (ctx){
+    if (ctx.start.identifier.text != ctx.end.identifier.text) {
+        throw `Block start '${ctx.start.identifier.text}' does not match the block end '${ctx.end.identifier.text}'.`;
+    }
+    var temp = `${this.mangleEscape(ctx.start.identifier.text)}(${this._inputVar},${ctx.body.source}`;
+    for (var i = 0; i < ctx.start.args.length; i++) {
+        temp += `,${ctx.start.args[i].source}`;
+    }
+    temp += ')';
+    this.append(temp);
+};
+
+HandlebarsCompiler.prototype.enterBlockBody = function (ctx) {
+    this.pushScope();
+};
+
+HandlebarsCompiler.prototype.exitBlockBody = function (ctx) {
+    ctx.source = (new Function(this._inputVar, this.popScope())).toString();
 };
 
 exports.HandlebarsCompiler = HandlebarsCompiler;
