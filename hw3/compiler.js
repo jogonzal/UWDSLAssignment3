@@ -19,6 +19,10 @@ var ifFunction = function(ctx, body, lookup){
     return "";
 };
 
+var withFunction = function(ctx, body, lookup){
+    return body(lookup);
+};
+
 function HandlebarsCompiler() {
     HandlebarsParserListener.call(this);
     this._inputVar = "__$ctx";
@@ -28,6 +32,7 @@ function HandlebarsCompiler() {
 
     this._helpers.block["each"] = foreachFunction;
     this._helpers.block["if"] = ifFunction;
+    this._helpers.block["with"] = withFunction;
 
     return this;
 }
