@@ -3,12 +3,24 @@ var HandlebarsLexer = require('HandlebarsLexer').HandlebarsLexer;
 var HandlebarsParser = require('HandlebarsParser').HandlebarsParser;
 var HandlebarsParserListener = require('HandlebarsParserListener').HandlebarsParserListener;
 
+var foreachFunction = function(ctx, body, lookup){
+    var appendedResult = "";
+    var varArr = lookup;
+    for(var i = 0; i< varArr.length; i++){
+        appendedResult += body(varArr[i]);
+    }
+    return appendedResult;
+};
+
 function HandlebarsCompiler() {
     HandlebarsParserListener.call(this);
     this._inputVar = "__$ctx";
     this._outputVar = "__$result";
     this._helpers = { expr: {}, block: {} };
     this._usedExprHelpers = [];
+
+    this._helpers.block["each"] = foreachFunction;
+
     return this;
 }
 
