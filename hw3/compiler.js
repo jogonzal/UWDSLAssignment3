@@ -20,7 +20,7 @@ var ifFunction = function(ctx, body, lookup){
 };
 
 var withFunction = function(ctx, body, lookup){
-    return body(lookup);
+    return body(ctx[lookup]);
 };
 
 function HandlebarsCompiler() {

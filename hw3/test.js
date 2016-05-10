@@ -258,30 +258,6 @@ describe("Blocks", function () {
         expect(render).to.equal(expected);
     });
 
-    it("'with' block extra test", function () {
-        var template = `
-<html><body>
-<ul>{{#with data}}
-    <li>{{name}}</li>
-{{/with}}</ul>
-</body></html>`;
-        var compiler = new Compiler();
-        var f = compiler.compile(template);
-        var data = {
-            data: {
-                name: "Jorge"
-            }
-        };
-        var render = f(data);
-        var expected = `
-<html><body>
-<ul>
-    <li>Jorge</li>
-</ul>
-</body></html>`;
-        expect(render).to.equal(expected);
-    });
-
     it("'if' block is conditional", function () {
         var template = `
 <html><body>
