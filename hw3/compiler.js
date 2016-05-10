@@ -12,6 +12,13 @@ var foreachFunction = function(ctx, body, lookup){
     return appendedResult;
 };
 
+var ifFunction = function(ctx, body, lookup){
+    if(lookup){
+        return body(ctx);
+    }
+    return "";
+};
+
 function HandlebarsCompiler() {
     HandlebarsParserListener.call(this);
     this._inputVar = "__$ctx";
@@ -20,6 +27,7 @@ function HandlebarsCompiler() {
     this._usedExprHelpers = [];
 
     this._helpers.block["each"] = foreachFunction;
+    this._helpers.block["if"] = ifFunction;
 
     return this;
 }
