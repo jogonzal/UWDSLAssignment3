@@ -30,35 +30,35 @@ subExpression returns [source]
     | dataLookup
     ;
 
-// TODO
-helperApplication returns [source]:
-    funcName=ID (args+=subExpression)+
+helperApplication returns [source]
+    : funcName=ID (args+=subExpression)+
     ;
 
-parenthesizedExpression returns [source]:
-    OPEN_PAREN exp=expression CLOSE_PAREN;
+parenthesizedExpression returns [source]
+    : OPEN_PAREN exp=expression CLOSE_PAREN;
 
-literal returns [source]:
-    INTEGER
+literal returns [source]
+    : INTEGER
     | FLOAT
     | STRING
     ;
 
-dataLookup returns [source]:
-    variableName=ID
+dataLookup returns [source]
+    : variableName=ID
     ;
 
-blockElement returns [source]:
-    start=blockStart body=blockBody end=blockEnd;
+blockElement returns [source]
+    : start=blockStart body=blockBody end=blockEnd;
 
-blockStart returns [source]:
-    START BLOCK identifier=ID (args+=subExpression)* END;
+blockStart returns [source]
+    : START BLOCK identifier=ID (args+=subExpression)* END;
 
-blockBody returns [source]:
-    element*
+blockBody returns [source]
+    : element*
     ;
 
-blockEnd returns [source]:
-    START CLOSE_BLOCK identifier=ID END;
+blockEnd returns [source]
+    : START CLOSE_BLOCK identifier=ID END;
 
-commentElement : START COMMENT END_COMMENT ;
+commentElement
+    : START COMMENT END_COMMENT ;
