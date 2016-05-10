@@ -15,12 +15,28 @@ rawElement
     : TEXT
     | BRACE TEXT;
 
-expression returns [source] :
-    helperApplication
-    | parenthesizedExpression
+expressionElement
+    : START exp=expression END
+    ;
+
+expression returns [source]
+    : helperApplication
+    | subExpression
+    ;
+
+subExpression returns [source]
+    : parenthesizedExpression
     | literal
     | dataLookup
     ;
+
+// TODO
+helperApplication returns [source]:
+    funcName=ID (args+=subExpression)+
+    ;
+
+parenthesizedExpression returns [source]:
+    OPEN_PAREN exp=expression CLOSE_PAREN;
 
 literal returns [source]:
     INTEGER
@@ -28,33 +44,21 @@ literal returns [source]:
     | STRING
     ;
 
-parenthesizedExpression returns [source]:
-    OPEN_PAREN exp=expression CLOSE_PAREN;
-
-// TODO
-helperApplication returns [source]:
-    funcName=ID (args+=expression)+
-    ;
-
 dataLookup returns [source]:
     variableName=ID
-    ;
-
-expressionElement:
-    START exp=expression END
     ;
 
 blockElement returns [source]:
     start=blockStart body=blockBody end=blockEnd;
 
 blockStart returns [source]:
-    START BLOCK identifier=ID (args+=expression)* END;
-
-blockEnd returns [source]:
-    START CLOSE_BLOCK identifier=ID CLOSE_BLOCK END;
+    START BLOCK identifier=ID (args+=subExpression)* END;
 
 blockBody returns [source]:
     element*
     ;
+
+blockEnd returns [source]:
+    START CLOSE_BLOCK identifier=ID END;
 
 commentElement : START COMMENT END_COMMENT ;

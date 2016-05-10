@@ -191,4 +191,8 @@ HandlebarsCompiler.prototype.exitBlockBody = function (ctx) {
     ctx.source = (new Function(this._inputVar, this.popScope())).toString();
 };
 
+HandlebarsCompiler.prototype.exitSubExpression = function (ctx) {
+    ctx.source = ctx.children[0].source;
+};
+
 exports.HandlebarsCompiler = HandlebarsCompiler;
